@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Desa Wisata</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page-bg"></div>
+
+    <main class="page-shell">
+        <section class="hero-section">
+            <div class="hero-copy">
+                <span class="eyebrow">Desa Wisata</span>
+                <h1>Wisata Lokal Lebih Mudah dengan Chatbot Pintar</h1>
+                <p>Temukan destinasi wisata, harga tiket, fasilitas, dan tips perjalanan lokal dengan antarmuka modern dan interaktif.</p>
+
+                <div class="hero-actions">
+                    <a href="#destinations" class="button primary">Lihat Destinasi</a>
+                    <a href="#chat-section" class="button secondary">Tanya Sekarang</a>
+                </div>
+
+                <div class="hero-highlights">
+                    <div>
+                        <strong>250+</strong>
+                        <span>Review Wisata</span>
+                    </div>
+                    <div>
+                        <strong>12</strong>
+                        <span>Destinasi Terbaik</span>
+                    </div>
+                    <div>
+                        <strong>99%</strong>
+                        <span>Jawaban Cepat</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <div class="hero-card__badge">Interaktif</div>
+                    <h2>Informasi Wisata Sekejap</h2>
+                    <p>Chatbot kami membantu kamu memahami destinasi, harga tiket, akses transportasi, dan rekomendasi aktivitas tanpa pusing.</p>
+                    <div class="hero-tags">
+                        <span>Alam</span>
+                        <span>Budaya</span>
+                        <span>Keluarga</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="destinations" class="cards-section">
+            <div class="section-head">
+                <div>
+                    <p class="section-label">Destinasi Rekomendasi</p>
+                    <h2>Tempat Menarik di Sekitar Desa</h2>
+                </div>
+                <a href="#chat-section" class="button tertiary">Cek Rute</a>
+            </div>
+
+            <div class="cards-grid">
+                <article class="destination-card">
+                    <div class="card-icon">🌿</div>
+                    <h3>Air Terjun Lestari</h3>
+                    <p>Jalan setapak, kolam alami, dan area foto dengan pemandangan hijau.</p>
+                    <div class="card-meta">
+                        <span>Rp 15.000</span>
+                        <span>Alam</span>
+                    </div>
+                </article>
+
+                <article class="destination-card">
+                    <div class="card-icon">🏕️</div>
+                    <h3>Kemah Desa Harmoni</h3>
+                    <p>Penginapan glamping sederhana dengan api unggun dan wisata malam.</p>
+                    <div class="card-meta">
+                        <span>Rp 120.000</span>
+                        <span>Keluarga</span>
+                    </div>
+                </article>
+
+                <article class="destination-card">
+                    <div class="card-icon">🎨</div>
+                    <h3>Desa Budaya Citrasari</h3>
+                    <p>Pameran seni, tarian tradisional, dan pengalaman kerajinan tangan.</p>
+                    <div class="card-meta">
+                        <span>Rp 7.000</span>
+                        <span>Budaya</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <article class="info-card">
+                <div class="info-icon">💡</div>
+                <h3>Tips Wisata</h3>
+                <p>Siapkan payung, gunakan alas kaki nyaman, dan cek jam buka sebelum berangkat.</p>
+            </article>
+            <article class="info-card">
+                <div class="info-icon">🗺️</div>
+                <h3>FAQ Cepat</h3>
+                <p>Tanya soal tiket, parkir, transportasi, dan fasilitas desa secara langsung dalam chat.</p>
+            </article>
+            <article class="info-card">
+                <div class="info-icon">⚡</div>
+                <h3>Respon Instan</h3>
+                <p>Chatbot memberikan jawaban cepat dengan model kecocokan pertanyaan otomatis.</p>
+            </article>
+        </section>
+
+        <section class="chat-cta-section">
+            <div class="chat-cta-card">
+                <div>
+                    <span class="eyebrow">Chatbot</span>
+                    <h2>Masih butuh jawaban cepat?</h2>
+                    <p>Buka halaman chat terpisah agar pengalaman lebih ringkas dan tidak membuat halaman utama terlalu panjang.</p>
+                </div>
+                <a href="/chatbot" class="button primary">Buka Chat</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        userInput?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function addMessage(content, role) {
+            const type = role === 'user' ? 'user-message' : 'bot-message';
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div class="${type} chat-entry">
+                    <div class="message-label">${role === 'user' ? 'Anda' : 'Chatbot'}</div>
+                    <p>${content}</p>
+                </div>
+            `);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+            typingIndicator.classList.remove('hidden');
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            typingIndicator.classList.add('hidden');
+            addMessage(data.response, 'bot');
+        }
+    </script>
+</body>
+</html>
