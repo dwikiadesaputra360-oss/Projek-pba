@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Lengkung Langit 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .page-bg {
+            background-image: url("{{ url_for('static', filename='img/2.png') }}") !important;
+            background-size: cover !important;
+            background-position: center !important;
+        }
+    </style>
+</head>
+<body style="background-color: transparent !important;">
+    <div class="page-bg"></div>
+
+    <main class="page-shell chat-page">
+        <section class="chat-section chat-page-inner">
+            <div class="chat-panel-top">
+                <div class="chat-avatar">🤖</div>
+                <div>
+                    <span class="eyebrow">Chatbot</span>
+                    <h2>Mulai Tanya Jawab</h2>
+                    <p>Dapatkan informasi wisata yang kamu butuhkan, langsung dari asisten Lengkung Langit 2.</p>
+                </div>
+                <div class="chat-status">
+                    <span>Online</span>
+                    <strong>Siap membalas</strong>
+                </div>
+            </div>
+
+            <div class="chat-window">
+                <div id="chat-box" class="chat-box">
+                    <div class="welcome-message">
+                        <div class="message-badge">Selamat datang</div>
+                        <p>Halo! Tanyakan apa saja: harga tiket, lokasi, jam buka, hingga aktivitas menarik di Lengkung Langit 2.</p>
+                    </div>
+                    <div id="typing-indicator" class="typing-indicator hidden">
+                        <span></span><span></span><span></span>
+                        <small>Chatbot sedang mengetik...</small>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="chip" onclick="setQuickQuestion('Berapa harga tiket masuk?')">Berapa harga tiket?</button>
+                    <button class="chip" onclick="setQuickQuestion('Jam buka Lengkung Langit 2?')">Jam buka?</button>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Tulis pertanyaan...">
+                <button onclick="sendMessage()">Kirim</button>
+            </div>
+
+            <div class="chat-footer">
+                <a href="/" class="button secondary">Kembali ke Beranda</a>
+                <p>Tip: klik salah satu pertanyaan cepat atau ketik secara langsung.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function setQuickQuestion(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+
+        function addMessage(content, role) {
+            const type = role === 'user' ? 'user-message' : 'bot-message';
+            const avatar = role === 'user' ? '👤' : '🤖';
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div class="message-row ${type} chat-entry">
+                    <div class="message-avatar">${avatar}</div>
+                    <div class="message-content">
+                        <div class="message-label">${role === 'user' ? 'Anda' : 'Chatbot'}</div>
+                        <p>${content}</p>
+                    </div>
+                </div>
+            `);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+            typingIndicator.classList.remove('hidden');
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            typingIndicator.classList.add('hidden');
+            addMessage(data.response, 'bot');
+        }
+    </script>
+</body>
+</html>
